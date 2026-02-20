@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 import cors from 'cors';
 import express from 'express';
 import { init } from "./config/init.js";
-import taskRoutes from "./routes/task.router.js";
+import productRoutes from "./routes/product.router.js";
 import userRoutes from "./routes/user.router.js";
 
 dotenv.config();
@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 
 // api versioning
 app.use("/api/v1/auth", userRoutes);
-app.use("/api/v1/tasks", taskRoutes);
+app.use("/api/v1/products", productRoutes);
 
 init().then(() => {
   app.listen(process.env.PORT, () => {
