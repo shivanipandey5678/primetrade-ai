@@ -1,4 +1,4 @@
-# Primetrade.ai
+
 
 Product app with **backend** (Node + Express + MongoDB) and **frontend** (React + Vite). Users can register/login, view products, and add/remove favorites.
 
