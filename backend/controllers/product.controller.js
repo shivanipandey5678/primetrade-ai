@@ -1,4 +1,5 @@
 import { Product } from "../models/Product.js";
+import { User } from "../models/Users.js";
 
 //create product
 
@@ -141,9 +142,47 @@ const getSingleProduct = async (req, res) => {
             .status(500)
             .json({ message: "something went wrong ", error: error.message });
     }
+};
 
-}
+// add product to user favorites (requires auth)
+const addFavoriteProduct = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const userId = req.user.id;
+        if (!productId || !userId) return res.status(400).json({ message: "Product ID and User ID are required" });
+        const product = await Product.findById(productId);
+        if (!product) return res.status(404).json({ message: "product not found!" });
+        const updatedUser = await User.findByIdAndUpdate(userId, { $addToSet: { favorites: productId } }, { new: true });
+        return res.status(200).json({
+            message: "Added to favorites",
+            favorites: updatedUser.favorites
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Server error" });
+    }
+};
 
+// remove product from user favorites (requires auth)
+const removeFavoriteProduct = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const userId = req.user.id;
+        if (!productId || !userId) return res.status(400).json({ message: "Product ID and User ID are required" });
+        const updatedUser = await User.findByIdAndUpdate(
+            userId,
+            { $pull: { favorites: productId } },
+            { new: true }
+        );
+        if (!updatedUser) return res.status(404).json({ message: "User not found" });
+        return res.status(200).json({
+            message: "Removed from favorites",
+            favorites: updatedUser.favorites
+        });
+    } catch (error) {
+        console.error(error);
+        return res.status(500).json({ message: "Server error" });
+    }
+};
 
-
-export { addProduct, deleteProduct, updateProduct, getProducts, getSingleProduct }
+export { addProduct, deleteProduct, updateProduct, getProducts, getSingleProduct, addFavoriteProduct, removeFavoriteProduct }
