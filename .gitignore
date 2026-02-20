@@ -6,8 +6,6 @@ node_modules/
 .env.local
 .env.*.local
 
-# Build
-frontend/dist
 
 # Logs / OS
 *.log

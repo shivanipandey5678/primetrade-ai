@@ -41,7 +41,9 @@ const addTask = async(req,res) => {
 const deleteTask = async (req,res)=> {
     try {
          const {id} = req.body;
+         if (!id) return res.status(400).json({ message: "Task ID is required" });
         const isTaskDeleted = await Task.findByIdAndDelete(id);
+    
     if (!isTaskDeleted) {
       return res.status(404).json({ message: "issue in del the task " });
     }

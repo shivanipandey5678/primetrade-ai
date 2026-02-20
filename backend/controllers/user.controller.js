@@ -5,13 +5,13 @@ import jwt from "jsonwebtoken";
 //user register
 const registerUser = async (req, res) => {
   try {
-    let { username, email, password } = req.body;
+    let { name, email, password } = req.body;
 
-    if (!username || !email || !password) {
+    if (!name || !email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
     if (
-      username.trim() === "" ||
+      name.trim() === "" ||
       email.trim() === "" ||
       password.trim() === ""
     ) {
@@ -32,10 +32,10 @@ const registerUser = async (req, res) => {
       return res.status(400).json({ message: "user already exists" });
     }
 
-    const hashedPass = await bcrypt.hash(password, process.env.SALT);
+    const hashedPass = await bcrypt.hash(password, Number(process.env.SALT));
    
     const newUser = await User.create({
-      username,
+      name,
       email,
       password: hashedPass,
     });
@@ -43,7 +43,7 @@ const registerUser = async (req, res) => {
      const token = jwt.sign(
       {
         id: newUser._id,
-        username: newUser.username,
+        name: newUser.name,
         email: newUser.email,
       },
       process.env.JWT_Secret,
@@ -56,7 +56,7 @@ const registerUser = async (req, res) => {
         message: "new user created!",
         user: {
           id: newUser._id,
-          username: newUser.username,
+          name: newUser.name,
           email: newUser.email,
         },
         token,
@@ -68,19 +68,19 @@ const registerUser = async (req, res) => {
   }
 };
 
-//login register
+//login
 const loginUser = async (req, res) => {
   try {
-    let { username, password } = req.body;
+    let { email, password } = req.body;
 
-    if (!username || !password) {
+    if (!email || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
-    if (username.trim() === "" || password.trim() === "") {
+    if (email.trim() === "" || password.trim() === "") {
       return res.status(400).json({ message: "All fields are required" });
     }
 
-    const isUserExist = await User.findOne({ username });
+    const isUserExist = await User.findOne({ email });
     if (!isUserExist) {
       return res.status(404).json({ message: "user not found" });
     }
@@ -91,7 +91,7 @@ const loginUser = async (req, res) => {
     const token = jwt.sign(
       {
         id: isUserExist._id,
-        username: isUserExist.username,
+        name: isUserExist.name,
         email: isUserExist.email,
       },
       process.env.JWT_Secret,
@@ -101,10 +101,10 @@ const loginUser = async (req, res) => {
     return res
       .status(200)
       .json({
-        message: "slogged in successfully ",
+        message: "logged in successfully ",
         user: {
           id: isUserExist._id,
-          username: isUserExist.username,
+          name: isUserExist.name,
           email: isUserExist.email,
         },
         token,
